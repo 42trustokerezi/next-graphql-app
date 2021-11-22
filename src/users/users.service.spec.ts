@@ -1,18 +1,25 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { UsersService } from './users.service';
+import { Injectable } from '@nestjs/common';
+import { v4 as uuidv4 } from 'uuid';
+import { GetUserArgs } from './dto/args/get-user.args';
+import { CreateUserInput } from './dto/input/create-user.input';
+import { User } from './models/user';
 
-describe('UsersService', () => {
-  let service: UsersService;
+@Injectable()
+export class UsersService {
+    private users: User[] = [];
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [UsersService],
-    }).compile();
+    public createUser(createUserData: CreateUserInput): User {
+        const user: User = {
+            userId: uuidv4(),
+            ...createUserData
+        }
 
-    service = module.get<UsersService>(UsersService);
-  });
+        this.users.push(user);
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
-  });
-});
+        return user;
+    }
+
+    public getUser(getUserArgs: GetUserArgs): User {
+        return this.users.find(user => user.userId === getUserArgs.userId);
+    }
+}
